@@ -1,56 +1,46 @@
 {
-	"name": "kdyby/elastic-search",
+	"name": "contributte/elastica",
 	"type": "library",
-	"description": "Integration of Elastica for ElasticSearch into Nette Framework",
-	"keywords": ["nette", "kdyby", "elasticsearch", "search", "elastic", "es"],
-	"homepage": "http://kdyby.org",
-	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"description": "Elastica implementation for Nette Framework",
+	"keywords": ["elastica", "elasticsearch", "nette", "elastic", "search", "es"],
+	"homepage": "https://github.com/contributte/elastica",
+	"license": "MIT",
 	"authors": [
 		{
-			"name": "Filip Procházka",
-			"homepage": "http://filip-prochazka.com",
-			"email": "filip@prochazka.su"
+			"name": "Dalibor Korpar",
+			"email": "dalibor.korpar@gmail.com"
 		}
 	],
-	"support": {
-		"email": "filip@prochazka.su",
-		"issues": "https://github.com/Kdyby/ElasticSearch/issues"
-	},
 	"require": {
 		"php": ">=7.2",
-		"nette/di": "~3.0",
-		"tracy/tracy": "~2.6",
-		"nette/utils": "~3.0",
-
-		"ruflin/elastica": "~7.0"
+		"ruflin/elastica": "^7.0",
+		"nette/di": "^3.0",
+		"nette/utils": "^3.0"
 	},
 	"require-dev": {
-		"nette/application": "~3.0",
-		"nette/bootstrap": "~3.0",
-		"nette/caching": "~3.0",
-		"nette/component-model": "~3.0",
-		"nette/database": "~3.0",
-		"nette/finder": "~2.5",
-		"nette/forms": "~3.0",
-		"nette/http": "~3.0",
-		"nette/mail": "~3.0",
-		"nette/neon": "~3.0",
-		"nette/php-generator": "~3.0",
-		"nette/robot-loader": "~3.0",
-		"nette/safe-stream": "~2.4",
-		"nette/security": "~3.0",
-		"nette/tokenizer": "~3.0",
-		"latte/latte": "~2.5",
-		"phpunit/phpunit": "^7.0|8.0|^9.0"
+		"tracy/tracy": "^2.6",
+		"nette/http": "^3.0",
+		"nette/bootstrap": "^3.0",
+		"phpunit/phpunit": "^7.0|8.0|^9.0",
+		"ninjify/qa": "^v0.10",
+		"phpstan/phpstan": "^0.12.6",
+		"phpstan/phpstan-deprecation-rules":"^0.12",
+		"phpstan/phpstan-nette":"^0.12",
+		"phpstan/phpstan-strict-rules":"^0.12"
 	},
 	"autoload": {
-		"psr-0": {
-			"Kdyby\\ElasticSearch\\": "src/"
+		"psr-4": {
+			"Contributte\\Elastica\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
 		}
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "4.0.x-dev"
+			"dev-master": "1.0.x-dev"
 		}
 	}
 }

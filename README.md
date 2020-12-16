@@ -1,39 +1,58 @@
-Kdyby/ElasticSearch
-======
+![](https://heatbadger.now.sh/github/readme/contributte/elastica/)
 
-![build](https://github.com/Kdyby/ElasticSearch/workflows/build/badge.svg)
-[![Downloads this Month](https://img.shields.io/packagist/dm/kdyby/elastic-search.svg)](https://packagist.org/packages/kdyby/elastic-search)
-[![Latest stable](https://img.shields.io/packagist/v/kdyby/elastic-search.svg)](https://packagist.org/packages/kdyby/elastic-search)
-[![Coverage Status](https://coveralls.io/repos/github/Kdyby/ElasticSearch/badge.svg?branch=master)](https://coveralls.io/github/Kdyby/ElasticSearch?branch=master)
-[![Join the chat at https://gitter.im/Kdyby/Help](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Kdyby/Help)
+<p align=center>
+  <a href="https://github.com/contributte/elastica/actions"><img src="https://github.com/contributte/elastica/workflows/build/badge.svg"></a>
+  <a href="https://coveralls.io/r/contributte/elastica"><img src="https://badgen.net/coveralls/c/github/contributte/elastica?cache=300"></a>
+  <a href="https://packagist.org/packages/contributte/elastica"><img src="https://badgen.net/packagist/dm/contributte/elastica"></a>
+  <a href="https://packagist.org/packages/contributte/elastica"><img src="https://badgen.net/packagist/v/contributte/elastica"></a>
+</p>
+<p align=center>
+  <a href="https://packagist.org/packages/contributte/elastica"><img src="https://badgen.net/packagist/php/contributte/elastica"></a>
+  <a href="https://github.com/contributte/elastica"><img src="https://badgen.net/github/license/contributte/elastica"></a>
+  <a href="https://bit.ly/ctteg"><img src="https://badgen.net/badge/support/gitter/cyan"></a>
+  <a href="https://bit.ly/cttfo"><img src="https://badgen.net/badge/support/forum/yellow"></a>
+  <a href="https://contributte.org/partners.html"><img src="https://badgen.net/badge/sponsor/donations/F96854"></a>
+</p>
 
+<p align=center>
+Website 🚀 <a href="https://contributte.org">contributte.org</a> | Contact 👨🏻‍💻 <a href="https://f3l1x.io">f3l1x.io</a> | Twitter 🐦 <a href="https://twitter.com/contributte">@contributte</a>
+</p>
 
-Requirements
-------------
+## Usage
 
-Kdyby/ElasticSearch requires PHP 7.2 or higher (supports php 8.0 as well), and supports both nette 2.4 and 3.0
+To install latest version of `contributte/elastica` use [Composer](https://getcomposer.com).
 
-- [Nette Framework](https://github.com/nette/nette)
-- [Elastica](https://github.com/ruflin/Elastica)
-
-
-
-Installation
-------------
-
-The best way to install Kdyby/ElasticSearch is using  [Composer](http://getcomposer.org/):
-
-```sh
-$ composer require kdyby/elastic-search
+```
+composer require contributte/elastica
 ```
 
+## Documentation
 
-Documentation
-------------
+For details on how to use this package, check out our [documentation](.docs).
 
-Learn more in the [documentation](https://github.com/Kdyby/ElasticSearch/blob/master/docs/en/index.md).
+## Versions
 
+| State       | Version       | Branch   | Nette | PHP     |
+|-------------|---------------|----------|-------|---------|
+| dev         | `^1.1`        | `master` | 3.0+  | `^7.2`  |
+| stable      | `^1.0`        | `master` | 3.0+  | `^7.2`  |
+
+## Development
+
+See [how to contribute](https://contributte.org/contributing.html) to this package.
+
+This package is currently maintaining by these authors.
+
+<a href="https://github.com/dakorpar">
+ <img width="80" height="80" src="https://avatars0.githubusercontent.com/u/9303856?v=3&s=80">
+</a>
 
 -----
 
-Homepage [http://www.kdyby.org](http://www.kdyby.org) and repository [http://github.com/Kdyby/ElasticSearch](http://github.com/Kdyby/ElasticSearch).
+Inspired by [Filip Procházka](https://github.com/fprochazka) package [kdyby/ElasticSearch](https://github.com/Kdyby/ElasticSearch)
+
+-----
+
+
+Consider to [support](https://contributte.org/partners.html) **contributte** development team.
+Also thank you for using this package.
