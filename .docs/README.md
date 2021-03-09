@@ -13,10 +13,10 @@ For more information on how to use Elastica [read the official documentation](ht
 ## Setup
 
 ```bash
-$ composer require contributte/elastica
+composer require contributte/elastica
 ```
 register extension
-```yml
+```yaml
 extensions:
   elastica: Contributte\Elastica\DI\ElasticaExtension
 ```
