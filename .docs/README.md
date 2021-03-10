@@ -16,9 +16,10 @@ For more information on how to use Elastica [read the official documentation](ht
 composer require contributte/elastica
 ```
 register extension
-```yaml
+
+```neon
 extensions:
-  elastica: Contributte\Elastica\DI\ElasticaExtension
+	elastica: Contributte\Elastica\DI\ElasticaExtension
 ```
 
 
@@ -26,33 +27,33 @@ extensions:
 
 Define at least one host, this would be minimal possible config.
 
-```yaml
+```neon
 elastica:
-  hosts:
-    es01:
-      host: localhost
+	hosts:
+		es01:
+			host: localhost
 ```
 
 Full config
-```yaml
+```neon
 elastica:
-  debug: %debugMode%
-  hosts:
-    es01:
-      host: null
-      port: null
-      username: null
-      password: null
-      path: null
-      url: null
-      proxy: null
-      persistent: null
-      timeout: null
-      connections: null
-      roundRobin: null
-      log: null
-      retryOnConflict: null
-      bigintConversion: null
+	debug: %debugMode%
+	hosts:
+		es01:
+		host: null
+		port: null
+		username: null
+		password: null
+		path: null
+		url: null
+		proxy: null
+		persistent: null
+		timeout: null
+		connections: null
+		roundRobin: null
+		log: null
+		retryOnConflict: null
+		bigintConversion: null
 ```
 Extension does not pass any unset values to elastica so elastica defaults just work.
 Take a look to [Elastica docs](https://elastica-docs.readthedocs.io/en/latest/client.html#client-configurations).
