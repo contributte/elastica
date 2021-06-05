@@ -74,6 +74,7 @@ class Panel implements IBarPanel
 				return !is_array($data) ? Json::decode($data, Json::FORCE_ARRAY) : $data;
 			} catch (Nette\Utils\JsonException $e) {
 				try {
+					/** @var mixed $data */
 					return array_map(function ($row) {
 						return Json::decode((string) $row, Json::FORCE_ARRAY);
 					}, is_string($data) ? explode("\n", trim($data)) : []);
