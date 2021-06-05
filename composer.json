@@ -1,46 +1,53 @@
 {
-	"name": "contributte/elastica",
-	"type": "library",
-	"description": "Elastica implementation for Nette Framework",
-	"keywords": ["elastica", "elasticsearch", "nette", "elastic", "search", "es"],
-	"homepage": "https://github.com/contributte/elastica",
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "Dalibor Korpar",
-			"email": "dalibor.korpar@gmail.com"
-		}
-	],
-	"require": {
-		"php": ">=7.2",
-		"ruflin/elastica": "^7.0",
-		"nette/di": "^3.0",
-		"nette/utils": "^3.0"
-	},
-	"require-dev": {
-		"tracy/tracy": "^2.6",
-		"nette/http": "^3.0",
-		"nette/bootstrap": "^3.0",
-		"phpunit/phpunit": "^7.0|8.0|^9.0",
-		"ninjify/qa": "^v0.10",
-		"phpstan/phpstan": "^0.12.6",
-		"phpstan/phpstan-deprecation-rules":"^0.12",
-		"phpstan/phpstan-nette":"^0.12",
-		"phpstan/phpstan-strict-rules":"^0.12"
-	},
-	"autoload": {
-		"psr-4": {
-			"Contributte\\Elastica\\": "src/"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"Tests\\": "tests/"
-		}
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "1.1.x-dev"
-		}
-	}
+  "name": "contributte/elastica",
+  "type": "library",
+  "description": "Elastica implementation for Nette Framework",
+  "keywords": [
+    "elastica",
+    "elasticsearch",
+    "nette",
+    "elastic",
+    "search",
+    "es"
+  ],
+  "homepage": "https://github.com/contributte/elastica",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dalibor Korpar",
+      "email": "dalibor.korpar@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "ruflin/elastica": "^7.0",
+    "nette/di": "^3.0",
+    "nette/utils": "^3.0"
+  },
+  "require-dev": {
+    "tracy/tracy": "^2.6",
+    "nette/http": "^3.0",
+    "nette/bootstrap": "^3.0",
+    "phpunit/phpunit": "^7.0|8.0|^9.0",
+    "ninjify/qa": "^v0.10",
+    "phpstan/phpstan": "^0.12.6",
+    "phpstan/phpstan-deprecation-rules": "^0.12",
+    "phpstan/phpstan-nette": "^0.12",
+    "phpstan/phpstan-strict-rules": "^0.12"
+  },
+  "autoload": {
+    "psr-4": {
+      "Contributte\\Elastica\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.1.x-dev"
+    }
+  }
 }
