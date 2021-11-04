@@ -21,25 +21,36 @@ class ElasticaExtension extends CompilerExtension
 	public function getConfigSchema(): Schema
 	{
 		// https://github.com/ruflin/Elastica/blob/master/src/ClientConfiguration.php#L26
+		$clientConfig = [
+			'host' => Expect::string()->nullable()->dynamic(),
+			'port' => Expect::int()->nullable()->dynamic(),
+			'path' => Expect::string()->nullable(),
+			'url' => Expect::string()->nullable(),
+			'proxy' => Expect::string()->nullable(),
+			'transport' => Expect::string()->nullable(),
+			'compression' => Expect::bool(),
+			'persistent' => Expect::bool(),
+			'timeout' => Expect::int()->nullable(),
+			'retryOnConflict' => Expect::int(),
+			'bigintConversion' => Expect::bool(),
+			'username' => Expect::string()->nullable()->dynamic(),
+			'password' => Expect::string()->nullable()->dynamic(),
+			'auth_type' => Expect::anyOf('basic', 'digest', 'gssnegotiate', 'ntlm')->nullable()->dynamic(),
+			'curl' => Expect::arrayOf('mixed', 'int'),
+			'headers' => Expect::arrayOf('string', 'string'),
+		];
+
 		return Expect::structure([
 			'debug' => Expect::bool(false),
-			'config' => Expect::structure([
-				'host' => Expect::string()->nullable()->dynamic(),
-				'port' => Expect::int()->nullable()->dynamic(),
-				'path' => Expect::string()->nullable(),
-				'url' => Expect::string()->nullable(),
-				'proxy' => Expect::string()->nullable(),
-				'transport' => Expect::string()->nullable(),
-				'persistent' => Expect::bool(),
-				'timeout' => Expect::int()->nullable(),
-				'connections' => Expect::array(), // host, port, path, transport, compression, persistent, timeout, username, password, auth_type, config -> (curl, headers, url)
-				'roundRobin' => Expect::bool(),
-				'retryOnConflict' => Expect::int(),
-				'bigintConversion' => Expect::bool(),
-				'username' => Expect::string()->nullable()->dynamic(),
-				'password' => Expect::string()->nullable()->dynamic(),
-				'auth_type' => Expect::string()->nullable()->dynamic(), //basic, digest, gssnegotiate, ntlm
-			])->skipDefaults()->castTo('array'),
+			'config' => Expect::structure(array_merge(
+				$clientConfig,
+				[
+					'connections' => Expect::arrayOf(
+						Expect::structure($clientConfig)->skipDefaults()->castTo('array')
+					),
+					'roundRobin' => Expect::bool(),
+				]
+			))->skipDefaults()->castTo('array'),
 		]);
 	}
 

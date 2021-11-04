@@ -44,6 +44,7 @@ elastica:
 		url: null
 		proxy: null
 		transport: null
+		compression: false
 		persistent: true
 		timeout: null
 		connections: []
@@ -53,11 +54,13 @@ elastica:
 		username: null
 		password: null
 		auth_type: null
+		curl: []
+		headers: []
 ```
 Extension does not pass any unset values to elastica so elastica defaults just work.
 Take a look to [Elastica docs](https://elastica-docs.readthedocs.io/en/latest/client.html#client-configurations).
 
-## Usage**
+## Usage
 
 Extension registers `Contributte\Elastica\Client` to DI container.
 
