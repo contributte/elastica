@@ -77,7 +77,9 @@ $esc = function ($s) {
                             </tr><?php } ?>
 
 						<?php if (isset($responseData['hits'])) { ?>
+                            <?php if (isset($responseData['hits']['total'])) { ?>
                             <tr><th width="100">Total&nbsp;hits:</th><td><?php echo $click($responseData['hits']['total']); ?></td></tr>
+                            <?php } ?>
                             <tr><th width="100">Max&nbsp;hit&nbsp;score:</th><td><?php echo $click($responseData['hits']['max_score']); ?></td></tr>
                             <tr><th width="100">Results:</th><td><?php echo $click($responseData['hits']['hits'], TRUE, 25); ?></td></tr>
 						<?php } ?>
