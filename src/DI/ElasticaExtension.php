@@ -64,7 +64,7 @@ class ElasticaExtension extends CompilerExtension
 
 	public function afterCompile(ClassType $class): void
 	{
-		$initialize = $class->methods['initialize'];
+		$initialize = $class->getMethod('initialize');
 		$initialize->addBody('?::getBlueScreen()->addPanel(?);', [new PhpLiteral(Debugger::class), Panel::class . '::renderException']);
 	}
 
