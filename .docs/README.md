@@ -29,31 +29,33 @@ Define at least one host, this would be minimal possible config.
 
 ```neon
 elastica:
-	hosts:
-		es01:
-			host: localhost
+	config:
+		host: localhost
 ```
 
 Full config
 ```neon
 elastica:
 	debug: %debugMode%
-	hosts:
-		es01:
+	config:
 		host: null
 		port: null
-		username: null
-		password: null
 		path: null
 		url: null
 		proxy: null
-		persistent: null
+		transport: null
+		compression: false
+		persistent: true
 		timeout: null
-		connections: null
+		connections: []
 		roundRobin: null
-		log: null
-		retryOnConflict: null
+		retryOnConflict: 0
 		bigintConversion: null
+		username: null
+		password: null
+		auth_type: null
+		curl: []
+		headers: []
 ```
 Extension does not pass any unset values to elastica so elastica defaults just work.
 Take a look to [Elastica docs](https://elastica-docs.readthedocs.io/en/latest/client.html#client-configurations).

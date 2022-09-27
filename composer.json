@@ -35,6 +35,9 @@
     "phpstan/phpstan-nette": "^1.0",
     "phpstan/phpstan-strict-rules": "^1.0"
   },
+  "conflict": {
+    "nette/schema": "<1.2.0"
+  },
   "autoload": {
     "psr-4": {
       "Contributte\\Elastica\\": "src/"

@@ -20,29 +20,37 @@ class ElasticaExtension extends CompilerExtension
 
 	public function getConfigSchema(): Schema
 	{
-		// https://elastica-docs.readthedocs.io/en/latest/client.html#client-configurations
+		// https://github.com/ruflin/Elastica/blob/master/src/ClientConfiguration.php#L26
+		$clientConfig = [
+			'host' => Expect::string()->nullable()->dynamic(),
+			'port' => Expect::int()->nullable()->dynamic(),
+			'path' => Expect::string()->nullable(),
+			'url' => Expect::string()->nullable(),
+			'proxy' => Expect::string()->nullable(),
+			'transport' => Expect::string()->nullable(),
+			'compression' => Expect::bool(),
+			'persistent' => Expect::bool(),
+			'timeout' => Expect::int()->nullable(),
+			'retryOnConflict' => Expect::int(),
+			'bigintConversion' => Expect::bool(),
+			'username' => Expect::string()->nullable()->dynamic(),
+			'password' => Expect::string()->nullable()->dynamic(),
+			'auth_type' => Expect::anyOf('basic', 'digest', 'gssnegotiate', 'ntlm')->nullable()->dynamic(),
+			'curl' => Expect::arrayOf('mixed', 'int'),
+			'headers' => Expect::arrayOf('string', 'string'),
+		];
+
 		return Expect::structure([
 			'debug' => Expect::bool(false),
-			'hosts' => Expect::arrayOf(
-				Expect::structure([
-					'port' => Expect::int(),
-					'path' => Expect::string(),
-					'host' => Expect::string(),
-					'url' => Expect::string(),
-					'proxy' => Expect::string(),
-					'transport' => Expect::string(),
-					'persistent' => Expect::bool(),
-					'timeout' => Expect::int(),
-					'connections' => Expect::array(),
+			'config' => Expect::structure(array_merge(
+				$clientConfig,
+				[
+					'connections' => Expect::arrayOf(
+						Expect::structure($clientConfig)->skipDefaults()->castTo('array')
+					),
 					'roundRobin' => Expect::bool(),
-					'compression' => Expect::bool(),
-					'log' => Expect::anyOf(Expect::bool(), Expect::string()),
-					'retryOnConflict' => Expect::int(),
-					'bigintConversion' => Expect::bool(),
-					'username' => Expect::string(),
-					'password' => Expect::string(),
-				])->castTo('array')
-			),
+				]
+			))->skipDefaults()->castTo('array'),
 		]);
 	}
 
@@ -52,7 +60,7 @@ class ElasticaExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$elastica = $builder->addDefinition($this->prefix('client'))
-			->setFactory(ContributteClient::class, [$this->config->hosts]);
+			->setFactory(ContributteClient::class, [$this->config->config]);
 
 		if ($this->config->debug) {
 			$builder->addDefinition($this->prefix('panel'))
