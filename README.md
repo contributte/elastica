@@ -32,10 +32,10 @@ For details on how to use this package, check out our [documentation](.docs).
 
 ## Versions
 
-| State       | Version       | Branch   | Nette | PHP      |
-|-------------|---------------|----------|-------|----------|
-| dev         | `^1.1`        | `master` | 3.0+  | `>=7.2`  |
-| stable      | `^1.0`        | `master` | 3.0+  | `>=7.2`  |
+| State       | Version | Branch   | Nette | PHP      |
+|-------------|---------|----------|-------|----------|
+| dev         | `^1.2`  | `master` | 3.0+  | `>=7.2`  |
+| stable      | `^1.1`  | `master` | 3.0+  | `>=7.2`  |
 
 ## Development
 
@@ -48,11 +48,6 @@ This package is currently maintaining by these authors.
 </a>
 
 -----
-
-Inspired by [Filip Procházka](https://github.com/fprochazka) package [kdyby/ElasticSearch](https://github.com/Kdyby/ElasticSearch)
-
------
-
 
 Consider to [support](https://contributte.org/partners.html) **contributte** development team.
 Also thank you for using this package.

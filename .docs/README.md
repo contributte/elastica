@@ -78,14 +78,13 @@ class YourService
 ```
 
 ## Monolog
+
 You can use monolog to log errors to kibana.
 
 Just register ElasticaHandler in monolog setup.
 
  - Monolog\Handler\ElasticaHandler
 
------
+## Inspiration
 
 Inspired by [Filip Procházka](https://github.com/fprochazka) package [kdyby/ElasticSearch](https://github.com/Kdyby/ElasticSearch).
-
------
