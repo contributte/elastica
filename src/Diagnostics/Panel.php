@@ -86,6 +86,7 @@ class Panel implements IBarPanel
 
 		$processedQueries = [];
 		$allQueries = $this->queries;
+		$totalTime = $this->totalTime;
 
 		foreach ($allQueries as $authority => $requests) {
 			/** @var Request[] $item */
