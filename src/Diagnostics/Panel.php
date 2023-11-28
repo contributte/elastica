@@ -7,34 +7,56 @@ use Elastica\Exception\ExceptionInterface;
 use Elastica\Exception\ResponseException;
 use Elastica\Request;
 use Elastica\Response;
-use Exception;
-use Nette;
+use Nette\Http\Url;
 use Nette\Utils\Html;
 use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 use Throwable;
 use Tracy\Debugger;
 use Tracy\Dumper;
 use Tracy\IBarPanel;
 
-/**
- * @codeCoverageIgnore
- */
 class Panel implements IBarPanel
 {
 
-	use Nette\SmartObject;
+	public float $totalTime = 0;
 
-	/** @var float */
-	public $totalTime = 0;
-
-	/** @var int */
-	public $queriesCount = 0;
+	public int $queriesCount = 0;
 
 	/** @var mixed[] */
-	public $queries = [];
+	public array $queries = [];
 
-	/** @var Client */
-	private $client;
+	private Client $client;
+
+	/**
+	 * @return array<string, string>|NULL
+	 */
+	public static function renderException(Throwable|null $e = null): ?array
+	{
+		if (!$e instanceof ExceptionInterface) {
+			return null;
+		}
+
+		$panel = null;
+
+		if ($e instanceof ResponseException) {
+			$panel .= '<h3>Request</h3>';
+			$panel .= Dumper::toHtml($e->getRequest());
+
+			$panel .= '<h3>Response</h3>';
+			$panel .= Dumper::toHtml($e->getResponse());
+
+		} elseif ($e instanceof \Elastica\Exception\Bulk\ResponseException) {
+			$panel .= '<h3>Failures</h3>';
+			$panel .= Dumper::toHtml($e->getFailures());
+
+		}
+
+		return $panel ? [
+			'tab' => 'ElasticSearch',
+			'panel' => $panel,
+		] : null;
+	}
 
 	public function getTab(): string
 	{
@@ -51,7 +73,6 @@ class Panel implements IBarPanel
 
 		return $tab->addHtml($title)->toHtml();
 	}
-
 
 	public function getPanel(): ?string
 	{
@@ -72,13 +93,11 @@ class Panel implements IBarPanel
 
 			try {
 				return !is_array($data) ? Json::decode($data, Json::FORCE_ARRAY) : $data;
-			} catch (Nette\Utils\JsonException $e) {
+			} catch (JsonException $e) {
 				try {
 					/** @phpstan-var mixed $data */
-					return array_map(function ($row) {
-						return Json::decode((string) $row, Json::FORCE_ARRAY);
-					}, is_string($data) ? explode("\n", trim($data)) : []);
-				} catch (Nette\Utils\JsonException $e) {
+					return array_map(fn ($row) => Json::decode((string) $row, Json::FORCE_ARRAY), is_string($data) ? explode("\n", trim($data)) : []);
+				} catch (JsonException $e) {
 					return $data;
 				}
 			}
@@ -86,7 +105,7 @@ class Panel implements IBarPanel
 
 		$processedQueries = [];
 		$allQueries = $this->queries;
-		$totalTime = $this->totalTime;
+		$totalTime = $this->totalTime; // @phpcs:ignore
 
 		foreach ($allQueries as $authority => $requests) {
 			/** @var Request[] $item */
@@ -131,14 +150,12 @@ class Panel implements IBarPanel
 		return $result === false ? null : $result;
 	}
 
-
 	public function success(Client $client, Request $request, Response $response, float $time): void
 	{
 		$this->queries[$this->requestAuthority($response)][] = [$request, $response, $time];
 		$this->totalTime += $time;
 		$this->queriesCount++;
 	}
-
 
 	public function failure(Client $client, Request $request, Throwable $e, float $time): void
 	{
@@ -150,55 +167,6 @@ class Panel implements IBarPanel
 		$this->queriesCount++;
 	}
 
-
-
-	protected function requestAuthority(?Response $response = null): string
-	{
-		if ($response) {
-			$info = $response->getTransferInfo();
-			$url = new Nette\Http\Url($info['url']);
-
-		} else {
-			/** @var string $current */
-			$current = key($this->queries);
-			$url = new Nette\Http\Url($current ?: 'http://localhost:9200/');
-		}
-
-		return $url->hostUrl;
-	}
-
-	/**
-	 * @param Exception|Throwable $e
-	 * @return array<string, string>|NULL
-	 */
-	public static function renderException($e = null): ?array
-	{
-		if (!$e instanceof ExceptionInterface) {
-			return null;
-		}
-
-		$panel = null;
-
-		if ($e instanceof ResponseException) {
-			$panel .= '<h3>Request</h3>';
-			$panel .= Dumper::toHtml($e->getRequest());
-
-			$panel .= '<h3>Response</h3>';
-			$panel .= Dumper::toHtml($e->getResponse());
-
-		} elseif ($e instanceof \Elastica\Exception\Bulk\ResponseException) {
-			$panel .= '<h3>Failures</h3>';
-			$panel .= Dumper::toHtml($e->getFailures());
-
-		}
-
-		return $panel ? [
-			'tab' => 'ElasticSearch',
-			'panel' => $panel,
-		] : null;
-	}
-
-
 	public function register(Client $client): void
 	{
 		$this->client = $client;
@@ -206,6 +174,21 @@ class Panel implements IBarPanel
 		$client->onFailure[] = [$this, 'failure'];
 
 		Debugger::getBar()->addPanel($this);
+	}
+
+	protected function requestAuthority(?Response $response = null): string
+	{
+		if ($response) {
+			$info = $response->getTransferInfo();
+			$url = new Url($info['url']);
+
+		} else {
+			/** @var string $current */
+			$current = key($this->queries);
+			$url = new Url($current ?: 'http://localhost:9200/');
+		}
+
+		return $url->hostUrl;
 	}
 
 }

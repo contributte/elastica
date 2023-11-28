@@ -6,7 +6,7 @@ use Contributte\Elastica\Client as ContributteClient;
 use Contributte\Elastica\Diagnostics\Panel;
 use Nette\DI\CompilerExtension;
 use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\PhpLiteral;
+use Nette\PhpGenerator\Literal;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use stdClass;
@@ -54,7 +54,6 @@ class ElasticaExtension extends CompilerExtension
 		]);
 	}
 
-
 	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
@@ -73,7 +72,7 @@ class ElasticaExtension extends CompilerExtension
 	public function afterCompile(ClassType $class): void
 	{
 		$initialize = $class->getMethod('initialize');
-		$initialize->addBody('?::getBlueScreen()->addPanel(?);', [new PhpLiteral(Debugger::class), Panel::class . '::renderException']);
+		$initialize->addBody('?::getBlueScreen()->addPanel(?);', [new Literal(Debugger::class), Panel::class . '::renderException']);
 	}
 
 }
