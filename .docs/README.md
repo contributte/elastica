@@ -33,7 +33,7 @@ elastica:
 		host: localhost
 ```
 
-Full config
+Full config with all possible options.
 ```neon
 elastica:
 	debug: %debugMode%
@@ -57,8 +57,11 @@ elastica:
 		curl: []
 		headers: []
 ```
+
 Extension does not pass any unset values to elastica so elastica defaults just work.
 Take a look to [Elastica docs](https://elastica-docs.readthedocs.io/en/latest/client.html#client-configurations).
+
+In docker environment you should use `host: elasticsearch` and `port: 9200` for example.
 
 ## Usage
 
