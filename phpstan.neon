@@ -16,3 +16,57 @@ parameters:
 		- .docs
 
 	ignoreErrors:
+		-
+			message: "#^Method Contributte\\\\Elastica\\\\Client\\:\\:request\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Client.php
+
+		-
+			message: "#^Method Contributte\\\\Elastica\\\\Client\\:\\:request\\(\\) has parameter \\$query with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Client.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Cannot access an offset on mixed\\.$#"
+			count: 2
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Casting to string something that's already string\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Only booleans are allowed in a negated boolean, array given\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Only booleans are allowed in a ternary operator condition, string\\|null given\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Only booleans are allowed in an if condition, Elastica\\\\Response\\|null given\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Only booleans are allowed in an if condition, int given\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Return type \\(string\\|null\\) of method Contributte\\\\Elastica\\\\Diagnostics\\\\Panel\\:\\:getPanel\\(\\) should be covariant with return type \\(string\\) of method Tracy\\\\IBarPanel\\:\\:getPanel\\(\\)$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
+
+		-
+			message: "#^Short ternary operator is not allowed\\. Use null coalesce operator if applicable or consider using long ternary\\.$#"
+			count: 1
+			path: src/Diagnostics/Panel.php
