@@ -2,7 +2,7 @@
 
 <p align=center>
   <a href="https://github.com/contributte/elastica/actions"><img src="https://github.com/contributte/elastica/workflows/build/badge.svg"></a>
-  <a href="https://coveralls.io/r/contributte/elastica"><img src="https://badgen.net/coveralls/c/github/contributte/elastica?cache=300"></a>
+  <a href="https://codecov.io/gh/contributte/elastica"><img src="https://badgen.net/codecov/c/github/contributte/elastica"></a>
   <a href="https://packagist.org/packages/contributte/elastica"><img src="https://badgen.net/packagist/dm/contributte/elastica"></a>
   <a href="https://packagist.org/packages/contributte/elastica"><img src="https://badgen.net/packagist/v/contributte/elastica"></a>
 </p>
