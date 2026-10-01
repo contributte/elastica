@@ -34,7 +34,7 @@ For details on how to use this package, check out our [documentation](.docs).
 
 | State       | Version | Branch   | Nette | Elastica       | PHP     |
 |-------------|---------|----------|-------|----------------|---------|
-| dev         | `^3.0`  | `master` | 3.1+  | `^8.0 \|\| ^9.0` | `>=8.1` |
+| dev         | `^3.0`  | `master` | 3.1+  | `^8.0 \|\| ^9.0` | `>=8.2` |
 | stable      | `^2.0`  | `master` | 3.1+  | `^7.3`         | `>=8.1` |
 
 ## Development
