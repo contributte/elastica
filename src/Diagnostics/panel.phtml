@@ -30,14 +30,22 @@ $esc = function ($s) {
     <h1 class="nette-elasticSearchPanel"><code><?php echo $esc($host) ?></code> - Queries: <?php echo $esc(count($queries)); ?>, time: <?php echo $esc($totalTime); ?> </h1>
     <div class="nette-inner tracy-inner nette-elasticSearchPanel">
 		<?php foreach($queries as $query): ?>
-			<?php list($request, $response, $time) = $query; $info = $response ? $response->getTransferInfo() : array('url' => 'http://localhost:9200/'); $url = new \Nette\Http\Url($info['url']); ?>
+			<?php
+				/** @var \Psr\Http\Message\RequestInterface $request */
+				$request = $query['request'];
+				/** @var \Psr\Http\Message\ResponseInterface|null $response */
+				$response = $query['response'];
+				$time = $query['time'];
+				$path = $request->getUri()->getPath();
+				parse_str($request->getUri()->getQuery(), $requestQuery);
+			?>
             <h2>
-                <code><?php echo $esc(strtoupper($request->getMethod())); ?> <?php echo $esc('/' . ltrim($url->path, '/')); ?></code>
+                <code><?php echo $esc(strtoupper($request->getMethod())); ?> <?php echo $esc('/' . ltrim($path, '/')); ?></code>
                 <small><?php echo $esc(number_format($time * 1000, 2)); ?>ms</small>
             </h2>
 
             <table>
-			<?php if ($request->getData()): $requestData = $extractData($request); ?>
+			<?php $requestData = $decode($request); if ($requestData !== null): ?>
                 <tr>
                 <th width="100"><a href="json:<?php echo $esc(\Nette\Utils\Json::encode($requestData)) ?>">Request:</th>
                 <td><?php echo $click($requestData, TRUE, 25); ?></td>
@@ -46,10 +54,10 @@ $esc = function ($s) {
 
             <tr>
                 <th width="100">Search type:</th>
-                <td><?php echo isset($request->getQuery()[\Elastica\Search::OPTION_SEARCH_TYPE]) ? $esc($request->getQuery()[\Elastica\Search::OPTION_SEARCH_TYPE]) : 'search' ?></td>
+                <td><?php echo isset($requestQuery[\Elastica\Search::OPTION_SEARCH_TYPE]) && is_string($requestQuery[\Elastica\Search::OPTION_SEARCH_TYPE]) ? $esc($requestQuery[\Elastica\Search::OPTION_SEARCH_TYPE]) : 'search' ?></td>
             </tr>
 
-			<?php if ($response && $response->isOk()) { $responsesData = $extractData($response); ?>
+			<?php if ($response !== null && $response->getStatusCode() >= 200 && $response->getStatusCode() < 300) { $responsesData = $decode($response); ?>
 				<?php $multiple = isset($responsesData['responses']); $responsesData = $multiple ? $responsesData['responses'] : array($responsesData); ?>
 
 				<?php foreach ($responsesData as $index => $responseData) { ?>
@@ -59,7 +67,7 @@ $esc = function ($s) {
                         <table class="multiRequest">
 					<?php } ?>
 
-					<?php if (stripos($request->getPath(), '_search') !== FALSE || stripos($request->getPath(), '_msearch') !== FALSE) { ?>
+					<?php if (stripos($path, '_search') !== FALSE || stripos($path, '_msearch') !== FALSE) { ?>
 						<?php if (isset($responseData['took'])) { ?><tr>
                             <th width="100">Took:</th><td><?php echo $click($responseData['took']); ?></td>
                             </tr><?php } ?>
@@ -91,7 +99,7 @@ $esc = function ($s) {
 						<?php if (isset($responseData['error'])) { ?>
                             <tr>
                                 <th width="100">Error:</th>
-                                <td style="color:red"><?php echo $esc($responseData['error']); ?></td>
+                                <td style="color:red"><?php echo is_string($responseData['error']) ? $esc($responseData['error']) : $click($responseData['error'], TRUE, 25); ?></td>
                             </tr>
 						<?php } ?>
 
@@ -99,17 +107,17 @@ $esc = function ($s) {
 
                         <tr>
                             <th width="100">Response:</th>
-                            <td><?php echo $click($response->getData(), TRUE, 25); ?></td>
+                            <td><?php echo $click($responseData, TRUE, 25); ?></td>
                         </tr>
 
 					<?php } ?>
 
 				<?php } ?>
 
-			<?php } elseif (isset($query[3]) && $query[3] instanceof \Exception) { ?>
+			<?php } elseif ($query['exception'] !== null) { ?>
                 <tr>
                     <th width="100">Error:</th>
-                    <td style="color:red"><?php echo $esc($query[3]->getMessage()); ?></td>
+                    <td style="color:red"><?php echo $esc($query['exception']->getMessage()); ?></td>
                 </tr>
 			<?php } ?>
 

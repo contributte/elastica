@@ -3,19 +3,25 @@
 namespace Contributte\Elastica\Diagnostics;
 
 use Contributte\Elastica\Client;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
+use Elastic\Elasticsearch\Response\Elasticsearch;
+use Elastica\Exception\Bulk\ResponseException as BulkResponseException;
 use Elastica\Exception\ExceptionInterface;
-use Elastica\Exception\ResponseException;
-use Elastica\Request;
-use Elastica\Response;
-use Nette\Http\Url;
 use Nette\Utils\Html;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Throwable;
 use Tracy\Debugger;
 use Tracy\Dumper;
 use Tracy\IBarPanel;
 
+/**
+ * @phpstan-type Query array{request: RequestInterface, response: ResponseInterface|null, time: float, exception: Throwable|null}
+ */
 class Panel implements IBarPanel
 {
 
@@ -23,39 +29,74 @@ class Panel implements IBarPanel
 
 	public int $queriesCount = 0;
 
-	/** @var mixed[] */
+	/** @var array<string, list<Query>> */
 	public array $queries = [];
 
 	private Client $client;
 
 	/**
-	 * @return array<string, string>|NULL
+	 * @return array{tab: string, panel: string}|null
 	 */
 	public static function renderException(Throwable|null $e = null): ?array
 	{
-		if (!$e instanceof ExceptionInterface) {
-			return null;
-		}
+		$panel = '';
 
-		$panel = null;
-
-		if ($e instanceof ResponseException) {
-			$panel .= '<h3>Request</h3>';
-			$panel .= Dumper::toHtml($e->getRequest());
+		if ($e instanceof ClientResponseException || $e instanceof ServerResponseException) {
+			$response = $e->getResponse();
 
 			$panel .= '<h3>Response</h3>';
-			$panel .= Dumper::toHtml($e->getResponse());
+			$panel .= Dumper::toHtml([
+				'status' => $response->getStatusCode(),
+				'body' => self::decodeBody($response),
+			]);
 
-		} elseif ($e instanceof \Elastica\Exception\Bulk\ResponseException) {
+		} elseif ($e instanceof BulkResponseException) {
 			$panel .= '<h3>Failures</h3>';
 			$panel .= Dumper::toHtml($e->getFailures());
 
+		} elseif (!$e instanceof ExceptionInterface) {
+			return null;
 		}
 
-		return $panel ? [
+		return $panel !== '' ? [
 			'tab' => 'ElasticSearch',
 			'panel' => $panel,
 		] : null;
+	}
+
+	/**
+	 * Decodes JSON (or NDJSON) body of PSR-7 message, falls back to raw string
+	 */
+	public static function decodeBody(MessageInterface $message): mixed
+	{
+		$body = $message->getBody();
+
+		if ($body->isSeekable()) {
+			$body->rewind();
+		}
+
+		$data = $body->getContents();
+
+		if ($body->isSeekable()) {
+			$body->rewind();
+		}
+
+		if ($data === '') {
+			return null;
+		}
+
+		try {
+			return Json::decode($data, true);
+		} catch (JsonException) {
+			try {
+				return array_map(
+					static fn (string $row): mixed => Json::decode($row, true),
+					explode("\n", trim($data))
+				);
+			} catch (JsonException) {
+				return $data;
+			}
+		}
 	}
 
 	public function getTab(): string
@@ -64,7 +105,7 @@ class Panel implements IBarPanel
 		$tab = Html::el('span')->title('Elastica')->addHtml($img);
 		$title = Html::el('span')->class('tracy-label');
 
-		if ($this->queriesCount) {
+		if ($this->queriesCount > 0) {
 			$title->setText(
 				$this->queriesCount . ' call' . ($this->queriesCount > 1 ? 's' : '') .
 				' / ' . sprintf('%0.2f', $this->totalTime * 1000) . ' ms'
@@ -74,72 +115,42 @@ class Panel implements IBarPanel
 		return $tab->addHtml($title)->toHtml();
 	}
 
-	public function getPanel(): ?string
+	public function getPanel(): string
 	{
-		if (!$this->queries) {
-			return null;
+		if ($this->queries === []) {
+			return '';
 		}
-
-		/**
-		 * @param Request|Response|mixed $object
-		 */
-		$extractData = function ($object) {
-			if (!($object instanceof Request) && !($object instanceof Response)) {
-				return [];
-			}
-
-			/** @var string|mixed[] $data */
-			$data = $object->getData();
-
-			try {
-				return !is_array($data) ? Json::decode($data, Json::FORCE_ARRAY) : $data;
-			} catch (JsonException $e) {
-				try {
-					/** @phpstan-var mixed $data */
-					return array_map(fn ($row) => Json::decode((string) $row, Json::FORCE_ARRAY), is_string($data) ? explode("\n", trim($data)) : []);
-				} catch (JsonException $e) {
-					return $data;
-				}
-			}
-		};
 
 		$processedQueries = [];
 		$allQueries = $this->queries;
 		$totalTime = $this->totalTime; // @phpcs:ignore
 
 		foreach ($allQueries as $authority => $requests) {
-			/** @var Request[] $item */
 			foreach ($requests as $i => $item) {
 				$processedQueries[$authority][$i] = $item;
 
-				if (isset($item[3])) {
+				if ($item['exception'] !== null) {
 					continue; // exception, do not re-execute
 				}
 
-				if (stripos($item[0]->getPath(), '_search') === false || $item[0]->getMethod() !== 'GET') {
+				$request = $item['request'];
+
+				if (stripos($request->getUri()->getPath(), '_search') === false || !in_array($request->getMethod(), ['GET', 'POST'], true)) {
 					continue; // explain only search queries
 				}
 
-				if (!is_array($data = $extractData($item[0]))) {
-					continue;
-				}
-
 				try {
-					$response = $this->client->request(
-						$item[0]->getPath(),
-						$item[0]->getMethod(),
-						$item[0]->getData(),
-						['explain' => 1] + $item[0]->getQuery()
-					);
+					$response = $this->client->sendRequest($this->withExplain($request));
 
 					// replace the search response with the explained response
-					$processedQueries[$authority][$i][1] = $response;
-
-				} catch (Throwable $e) {
+					$processedQueries[$authority][$i]['response'] = $response;
+				} catch (Throwable) {
 					// ignore
 				}
 			}
 		}
+
+		$decode = [self::class, 'decodeBody']; // @phpcs:ignore
 
 		ob_start();
 
@@ -147,22 +158,31 @@ class Panel implements IBarPanel
 
 		$result = ob_get_clean();
 
-		return $result === false ? null : $result;
+		return $result === false ? '' : $result;
 	}
 
-	public function success(Client $client, Request $request, Response $response, float $time): void
+	public function success(Client $client, RequestInterface $request, Elasticsearch $response, float $time): void
 	{
-		$this->queries[$this->requestAuthority($response)][] = [$request, $response, $time];
+		$this->queries[$this->requestAuthority($request)][] = [
+			'request' => $request,
+			'response' => $response,
+			'time' => $time,
+			'exception' => null,
+		];
 		$this->totalTime += $time;
 		$this->queriesCount++;
 	}
 
-	public function failure(Client $client, Request $request, Throwable $e, float $time): void
+	public function failure(Client $client, RequestInterface $request, Throwable $e, float $time): void
 	{
-		/** @var Response $response */
-		$response = method_exists($e, 'getResponse') ? $e->getResponse() : null;
+		$response = $e instanceof ClientResponseException || $e instanceof ServerResponseException ? $e->getResponse() : null;
 
-		$this->queries[$this->requestAuthority($response)][] = [$request, $response, $time, $e];
+		$this->queries[$this->requestAuthority($request)][] = [
+			'request' => $request,
+			'response' => $response,
+			'time' => $time,
+			'exception' => $e,
+		];
 		$this->totalTime += $time;
 		$this->queriesCount++;
 	}
@@ -176,19 +196,34 @@ class Panel implements IBarPanel
 		Debugger::getBar()->addPanel($this);
 	}
 
-	protected function requestAuthority(?Response $response = null): string
+	protected function requestAuthority(RequestInterface $request): string
 	{
-		if ($response) {
-			$info = $response->getTransferInfo();
-			$url = new Url($info['url']);
+		$uri = $request->getUri();
 
-		} else {
-			/** @var string $current */
-			$current = key($this->queries);
-			$url = new Url($current ?: 'http://localhost:9200/');
+		if ($uri->getHost() === '') {
+			return 'http://localhost:9200';
 		}
 
-		return $url->hostUrl;
+		// do not use getAuthority(), it contains user info (credentials)
+		$port = $uri->getPort();
+
+		return ($uri->getScheme() !== '' ? $uri->getScheme() : 'http') . '://' . $uri->getHost() . ($port !== null ? ':' . $port : '');
+	}
+
+	private function withExplain(RequestInterface $request): RequestInterface
+	{
+		$uri = $request->getUri();
+		$query = [];
+		parse_str($uri->getQuery(), $query);
+		$query['explain'] = 'true';
+
+		$body = $request->getBody();
+
+		if ($body->isSeekable()) {
+			$body->rewind();
+		}
+
+		return $request->withUri($uri->withQuery(http_build_query($query)));
 	}
 
 }
